@@ -1,0 +1,9 @@
+.bg-body-tertiary {
+    background-color: #299be4 !important;
+}
+
+.navbar-brand {
+    color: #fff;
+    font-size: 33px;
+    font-weight: 500;
+}
