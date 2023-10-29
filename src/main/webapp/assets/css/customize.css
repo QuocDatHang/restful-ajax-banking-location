@@ -7,3 +7,41 @@
     font-size: 33px;
     font-weight: 500;
 }
+
+.container {
+    padding: 0;
+}
+
+.container thead th {
+    background-color: #4caf50;
+    color: #fff;
+}
+
+.col-lg-6 {
+    padding-bottom: 7px !important;
+}
+
+footer.success {
+    background-color: #d1e7dd;
+    color: #416e4f;
+    height: 80px;
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+}
+
+footer.error {
+    background-color: #f8d7da;
+    color: #881f20;
+    height: 80px;
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+}
+
+.notification {
+    font-size: 23px;
+    font-weight: 400;
+}
