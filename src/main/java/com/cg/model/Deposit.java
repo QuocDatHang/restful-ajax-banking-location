@@ -1,11 +1,18 @@
 package com.cg.model;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
-
+@Entity
 public class Deposit {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToOne
+    @JoinColumn(name = "customer_id", referencedColumnName = "id", nullable = false)
     private Customer customer;
+    @Column(name = "transaction_ammount", precision = 10, scale = 2, columnDefinition = "decimal(10,2)")
     private BigDecimal transactionAmount;
+    @Column(columnDefinition = "boolean default false")
     private Boolean deleted;
 
     public Deposit() {

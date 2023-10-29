@@ -1,14 +1,20 @@
 package com.cg.model;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
-
+@Entity
 public class Customer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "full_name")
     private String fullName;
     private String email;
     private String phone;
     private String address;
+    @Column(precision = 10, scale = 2, columnDefinition = "decimal(10,2) default '0.00' ")
     private BigDecimal balance;
+    @Column(columnDefinition = "boolean default false")
     private Boolean deleted;
 
     public Customer() {

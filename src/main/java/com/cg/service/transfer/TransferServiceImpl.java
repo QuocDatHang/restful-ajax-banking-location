@@ -1,15 +1,17 @@
 package com.cg.service.transfer;
 
-import com.cg.model.Deposit;
 import com.cg.model.Transfer;
+import com.cg.repository.ITransferRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import javax.transaction.Transactional;
 import java.util.List;
-
+@Service
+@Transactional
 public class TransferServiceImpl implements ITransferService{
-    private final static List<Transfer> transfers = new ArrayList<>();
-
-    private static Long id;
+    @Autowired
+    private ITransferRepository transferRepository;
     @Override
     public List<Transfer> findAll() {
         return null;
@@ -21,15 +23,9 @@ public class TransferServiceImpl implements ITransferService{
     }
 
     @Override
-    public void create(Transfer transfer) {
-        transfer.setId(id++);
+    public void save(Transfer transfer) {
         transfer.setDeleted(false);
-        transfers.add(transfer);
-    }
-
-    @Override
-    public void update(Long id, Transfer transfer) {
-
+        transferRepository.save(transfer);
     }
 
     @Override

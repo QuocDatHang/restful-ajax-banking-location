@@ -3,43 +3,42 @@ package com.cg.service.customer;
 import com.cg.model.Customer;
 import com.cg.model.Deposit;
 import com.cg.model.Withdraw;
+import com.cg.repository.ICustomerRepository;
+import com.cg.repository.IDepositRepository;
+import com.cg.service.deposit.IDepositService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
+@Service
+@Transactional
 public class CustomerServiceImpl implements ICustomerService{
-    private static final List<Customer> customers = new ArrayList<>();
-    private static Long id = 1L;
-    static {
-        customers.add(new Customer(id++, "Nam", "namtran@gmail.com", "0122323231", "12 Le Loi", BigDecimal.ZERO, false));
-        customers.add(new Customer(id++, "Tuan", "tuanle@gmail.com", "8222366741", "1242 Nguyen Hue", BigDecimal.ZERO, false));
-    }
+    @Autowired
+    private ICustomerRepository customerRepository;
+    private IDepositService depositService;
 
     @Override
     public List<Customer> findAll() {
-        return customers;
+        return customerRepository.findAll();
     }
 
     @Override
     public Customer findById(Long id) {
-        return customers.stream().filter(customer -> customer.getId() == id).findFirst().orElse(null);
+        return customerRepository.findById(id).orElse(null);
     }
 
     @Override
-    public void create(Customer customer) {
-        customer.setId(id++);
+    public void save(Customer customer) {
+        if (customer.getBalance() == null){
         customer.setBalance(BigDecimal.ZERO);
         customer.setDeleted(false);
-        customers.add(customer);
-    }
-
-    @Override
-    public void update(Long id, Customer customer) {
-        int index = customers.indexOf(findById(id));
-        customer.setDeleted(false);
-        customers.set(index, customer);
+        }
+        customerRepository.save(customer);
     }
 
     @Override
@@ -52,7 +51,7 @@ public class CustomerServiceImpl implements ICustomerService{
         BigDecimal transactionAmount = deposit.getTransactionAmount();
         BigDecimal newBalance = currentBalance.add(transactionAmount);
         customer.setBalance(newBalance);
-//        update(customer.getId(), customer);
+        customerRepository.save(customer);
     }
     public void withdraw(Withdraw withdraw) {
         Customer customer = withdraw.getCustomer();
@@ -60,11 +59,11 @@ public class CustomerServiceImpl implements ICustomerService{
         BigDecimal transactionAmount = withdraw.getTransactionAmount();
         BigDecimal newBalance = currentBalance.subtract(transactionAmount);
         customer.setBalance(newBalance);
-        update(customer.getId(), customer);
+        customerRepository.save(customer);
     }
 
     @Override
     public List<Customer> findAllWithoutId(Long id) {
-        return customers.stream().filter(customer -> !Objects.equals(customer.getId(), id)).collect(Collectors.toList());
+        return customerRepository.findByIdNot(id);
     }
 }
