@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 @Service
 @Transactional
@@ -14,7 +16,7 @@ public class TransferServiceImpl implements ITransferService{
     private ITransferRepository transferRepository;
     @Override
     public List<Transfer> findAll() {
-        return null;
+        return transferRepository.findAll();
     }
 
     @Override
@@ -25,6 +27,7 @@ public class TransferServiceImpl implements ITransferService{
     @Override
     public void save(Transfer transfer) {
         transfer.setDeleted(false);
+        transfer.setCreateAt(LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));
         transferRepository.save(transfer);
     }
 

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Transfer histories</title>
+    <th:block th:replace="layout/header"/>
+</head>
+<body>
+<div class="container">
+    <header>
+        <nav class="navbar bg-body-tertiary">
+            <div class="container-fluid">
+                <div class="navbar-brand">Transfer histories</div>
+                <div class="d-flex" style="gap: 10px">
+                    <a href="/customers">
+                        <button class="btn btn-outline-light" type="button">
+                            <i class="fas fa-list"></i>
+                            Customer list
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="content">
+        <div class="container">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Sender</th>
+                    <th>Recipient</th>
+                    <th>Transfer amount</th>
+                    <th>Fees (%)</th>
+                    <th>Fees amount</th>
+                    <th>Transaction amount</th>
+                    <th>Time transfer</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="item : ${transfers}">
+                    <tr>
+                        <td th:text="${item.id}"></td>
+                        <td th:text="${item.getSender().fullName}"></td>
+                        <td th:text="${item.getRecipient().fullName}"></td>
+                        <td th:text="${item.getTransferAmount()}"></td>
+                        <td th:text="${item.fees}"></td>
+                        <td th:text="${item.feesAmount}"></td>
+                        <td th:text="${item.transactionAmount}"></td>
+                        <td th:text="${item.createAt}"></td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

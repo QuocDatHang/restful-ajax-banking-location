@@ -2,6 +2,7 @@ package com.cg.model;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 public class Transfer {
@@ -24,6 +25,8 @@ public class Transfer {
     private BigDecimal transactionAmount;
     @Column(columnDefinition = "boolean default false")
     private Boolean deleted;
+    @Column(name = "create_at", columnDefinition = "DATETIME")
+    private LocalDateTime createAt;
 
     public Transfer() {
     }
@@ -37,6 +40,14 @@ public class Transfer {
         this.feesAmount = feesAmount;
         this.transactionAmount = transactionAmount;
         this.deleted = deleted;
+    }
+
+    public LocalDateTime getCreateAt() {
+        return createAt;
+    }
+
+    public void setCreateAt(LocalDateTime createAt) {
+        this.createAt = createAt;
     }
 
     public Long getId() {

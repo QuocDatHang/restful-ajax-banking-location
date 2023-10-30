@@ -12,7 +12,7 @@ public class Customer {
     private String email;
     private String phone;
     private String address;
-    @Column(precision = 10, scale = 2, columnDefinition = "decimal(10,2) default '0.00' ")
+    @Column(columnDefinition = "decimal(10,2) default '0.00' ")
     private BigDecimal balance;
     @Column(columnDefinition = "boolean default false")
     private Boolean deleted;
