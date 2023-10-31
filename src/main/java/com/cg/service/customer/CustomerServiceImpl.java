@@ -24,7 +24,7 @@ public class CustomerServiceImpl implements ICustomerService{
 
     @Override
     public List<Customer> findAll() {
-        return customerRepository.findAll();
+        return customerRepository.findCustomersByDeletedIsFalse();
     }
 
     @Override
@@ -36,14 +36,16 @@ public class CustomerServiceImpl implements ICustomerService{
     public void save(Customer customer) {
         if (customer.getBalance() == null){
         customer.setBalance(BigDecimal.ZERO);
-        customer.setDeleted(false);
         }
+        customer.setDeleted(false);
         customerRepository.save(customer);
     }
 
     @Override
     public void delete(Long id) {
-
+        Customer customer = customerRepository.findById(id).orElse(null);
+        assert customer != null;
+        customer.setDeleted(true);
     }
     public void deposit(Deposit deposit) {
         Customer customer = deposit.getCustomer();

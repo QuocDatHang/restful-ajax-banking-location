@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -38,6 +39,7 @@ public class CustomerController {
         model.addAttribute("customers", customerService.findAll());
         return "customer/list";
     }
+
     @GetMapping("create")
     public String showCreate(Model model) {
         model.addAttribute("customer", new Customer());
@@ -81,7 +83,7 @@ public class CustomerController {
         Customer customer = customerService.findById(customerId);
         deposit.setCustomer(customer);
         if ((deposit.getTransactionAmount() == null) ||
-                (deposit.getTransactionAmount().compareTo(BigDecimal.ZERO) <= 0)){
+                (deposit.getTransactionAmount().compareTo(BigDecimal.ZERO) <= 0)) {
             model.addAttribute("success", false);
             model.addAttribute("checkValid", true);
             model.addAttribute("message", "Please input a number bigger 0");
@@ -123,7 +125,7 @@ public class CustomerController {
         withdraw.setCustomer(customer);
         if ((withdraw.getTransactionAmount() == null) ||
                 (withdraw.getTransactionAmount().compareTo(BigDecimal.ZERO) <= 0) ||
-                (withdraw.getTransactionAmount().compareTo(customer.getBalance()) > 0)){
+                (withdraw.getTransactionAmount().compareTo(customer.getBalance()) > 0)) {
             model.addAttribute("success", false);
             model.addAttribute("checkValid", false);
             model.addAttribute("message", "Please input a number bigger 0");
@@ -181,8 +183,8 @@ public class CustomerController {
         transfer.setSender(sender);
 
         if (transfer.getTransferAmount() == null ||
-            transfer.getTransferAmount().compareTo(BigDecimal.ZERO) <= 0 ||
-            transfer.getTransferAmount().multiply(BigDecimal.valueOf(1.1)).compareTo(sender.getBalance()) > 0) {
+                transfer.getTransferAmount().compareTo(BigDecimal.ZERO) <= 0 ||
+                transfer.getTransferAmount().multiply(BigDecimal.valueOf(1.1)).compareTo(sender.getBalance()) > 0) {
 
             model.addAttribute("transfer", transfer);
             model.addAttribute("recipients", recipients);
@@ -211,8 +213,14 @@ public class CustomerController {
     }
 
     @GetMapping("transferHistories")
-    public String transferHistories(Model model){
+    public String transferHistories(Model model) {
         model.addAttribute("transfers", transferService.findAll());
         return "customer/transfer_histories";
+    }
+
+    @GetMapping("delete/{customerId}")
+    public String delete(Model model, @PathVariable Long customerId, RedirectAttributes redirectAttributes) {
+        customerService.delete(customerId);
+        return "redirect:/customers";
     }
 }

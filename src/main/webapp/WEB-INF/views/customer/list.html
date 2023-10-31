@@ -84,10 +84,12 @@
                             </a>
                         </td>
                         <td>
+                            <a th:href="@{'/customers/delete/' + ${__item.id__}}" onclick="return confirm('Do you want to delete ?'+ '${__item.id__}')">
                             <button class="btn btn-outline-danger" data-bs-toggle="tooltip"
                                     data-bs-placement="top" title="Ban">
                                 <i class="fas fa-ban"></i>
                             </button>
+                            </a>
                         </td>
                     </tr>
                 </th:block>
@@ -95,7 +97,6 @@
             </table>
         </div>
     </div>
-
 </div>
 </body>
 </html>
