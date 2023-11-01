@@ -1,6 +1,9 @@
 package com.cg.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -15,13 +18,13 @@ public class Transfer {
     @ManyToOne
     @JoinColumn(name = "recipient_id", referencedColumnName = "id", nullable = false)
     private Customer recipient;
-    @Column(name = "transfer_amount", precision = 10, scale = 2, columnDefinition = "decimal(10,2)")
+    @Column(name = "transfer_amount", columnDefinition = "decimal(10,2)")
     private BigDecimal transferAmount;
     @Column(columnDefinition = "bigint default 10")
     private Long fees;
-    @Column(name = "fees_amount", precision = 10, scale = 2, columnDefinition = "decimal(10,2)")
+    @Column(name = "fees_amount", columnDefinition = "decimal(10,2)")
     private BigDecimal feesAmount;
-    @Column(name = "transaction_amount", precision = 10, scale = 2, columnDefinition = "decimal(10,2)")
+    @Column(name = "transaction_amount", columnDefinition = "decimal(10,2)")
     private BigDecimal transactionAmount;
     @Column(columnDefinition = "boolean default false")
     private Boolean deleted;

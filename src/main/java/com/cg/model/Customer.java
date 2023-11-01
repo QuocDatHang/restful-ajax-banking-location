@@ -1,6 +1,7 @@
 package com.cg.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 @Entity
 public class Customer {
@@ -8,8 +9,11 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "full_name")
+    @NotBlank(message = "Ten khong duoc de trong")
     private String fullName;
+    @NotBlank(message = "Email khong duoc de trong")
     private String email;
+    @NotBlank(message = "So dien thoai khong duoc de trong")
     private String phone;
     private String address;
     @Column(columnDefinition = "decimal(10,2) default '0.00' ")

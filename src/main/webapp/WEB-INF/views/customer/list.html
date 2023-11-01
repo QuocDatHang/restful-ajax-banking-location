@@ -76,7 +76,7 @@
                             </a>
                         </td>
                         <td>
-                            <a th:href="@{'/customers/transfer/' + ${__item.id__}}">
+                            <a th:href="@{/customers/transfer/__${item.id}__}">
                                 <button class="btn btn-outline-primary" data-bs-toggle="tooltip"
                                         data-bs-placement="top" title="Transfer money">
                                     <i class="fas fa-exchange-alt"></i>
@@ -84,7 +84,7 @@
                             </a>
                         </td>
                         <td>
-                            <a th:href="@{'/customers/delete/' + ${__item.id__}}" onclick="return confirm('Do you want to delete ?'+ '${__item.id__}')">
+                            <a th:href="@{/customers/delete/__${item.id}__}" onclick="return confirm('Do you want to delete ?')">
                             <button class="btn btn-outline-danger" data-bs-toggle="tooltip"
                                     data-bs-placement="top" title="Ban">
                                 <i class="fas fa-ban"></i>

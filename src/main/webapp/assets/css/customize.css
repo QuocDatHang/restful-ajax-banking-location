@@ -34,7 +34,7 @@ footer.success {
 footer.error {
     background-color: #f8d7da;
     color: #881f20;
-    height: 80px;
+    height: 100px;
     position: fixed;
     bottom: 0;
     display: flex;

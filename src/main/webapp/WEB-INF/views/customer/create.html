@@ -34,7 +34,7 @@
                 </div>
                 <div class="col-lg-6">
                     <label for="phone">Phone</label>
-                    <input type="tel" class="form-control" id="phone" th:field="*{phone}">
+                    <input type="number" class="form-control" id="phone" th:field="*{phone}">
                 </div>
                 <div class="col-lg-6">
                     <label for="address">Address</label>
@@ -56,10 +56,28 @@
     </footer>
 </th:block>
 
+<!--<th:block th:if="${success == false}">-->
+<!--    <footer class="container-fluid error" id="notification">-->
+<!--        <div class="container">-->
+<!--            <div class="col-lg-6">-->
+<!--                <th:block th:if="${error} == true">-->
+<!--                    <div class="alert alert-danger">-->
+<!--                        <ul class="list-styled">-->
+<!--                            <li th:each="err : ${#fields.errors('customer.*')}" th:text="${err}"></li>-->
+<!--                        </ul>-->
+<!--                    </div>-->
+<!--                </th:block>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </footer>-->
+<!--</th:block>-->
+
 <th:block th:if="${success == false}">
     <footer class="container-fluid error">
         <div class="container">
-            <div class="notification" th:text="${message}"></div>
+            <ul class="list-styled">
+                <li th:each="err : ${#fields.errors('customer.*')}" th:text="${err}"></li>
+            </ul>
         </div>
     </footer>
 </th:block>

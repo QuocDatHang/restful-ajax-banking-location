@@ -14,10 +14,12 @@ import com.cg.service.withdraw.IWithdrawService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -47,11 +49,12 @@ public class CustomerController {
     }
 
     @PostMapping("create")
-    public ModelAndView create(@ModelAttribute Customer customer) {
+    public ModelAndView create(@Valid @ModelAttribute Customer customer, BindingResult bindingResult) {
         ModelAndView modelAndView = new ModelAndView("customer/create");
-        if (customer.getFullName().isEmpty()) {
+        if (bindingResult.hasErrors()) {
             modelAndView.addObject("success", false);
-            modelAndView.addObject("message", "Create Failed");
+            modelAndView.addObject("error", true);
+            modelAndView.addObject("customer", customer);
         } else {
             customerService.save(customer);
             modelAndView.addObject("success", true);
@@ -64,41 +67,33 @@ public class CustomerController {
     public String depositPage(@PathVariable Long customerId, Model model) {
         Customer customer = customerService.findById(customerId);
         Deposit deposit = new Deposit();
+        deposit.setCustomer(customer);
 
         if (customer == null) {
             model.addAttribute("checkValid", false);
-            model.addAttribute("success", false);
             model.addAttribute("message", "Can not found customer");
         } else {
             model.addAttribute("checkValid", true);
-            deposit.setCustomer(customer);
         }
         model.addAttribute("deposit", deposit);
         return "customer/deposit";
     }
 
-
     @PostMapping("deposit/{customerId}")
-    public String deposit(@PathVariable Long customerId, @ModelAttribute Deposit deposit, Model model) {
+    public String deposit(@Valid @PathVariable Long customerId, @ModelAttribute Deposit deposit, BindingResult bindingResult, Model model) {
         Customer customer = customerService.findById(customerId);
         deposit.setCustomer(customer);
-        if ((deposit.getTransactionAmount() == null) ||
-                (deposit.getTransactionAmount().compareTo(BigDecimal.ZERO) <= 0)) {
+        if (bindingResult.hasErrors()) {
             model.addAttribute("success", false);
-            model.addAttribute("checkValid", true);
-            model.addAttribute("message", "Please input a number bigger 0");
-            model.addAttribute("deposit", deposit);
-            return "customer/deposit";
         } else {
             customerService.deposit(deposit);
             depositService.save(deposit);
             deposit.setTransactionAmount(null);
-            model.addAttribute("deposit", deposit);
             model.addAttribute("success", true);
-            model.addAttribute("checkValid", true);
             model.addAttribute("message", "Deposit successfully");
         }
-
+        model.addAttribute("checkValid", true);
+        model.addAttribute("deposit", deposit);
         return "customer/deposit";
     }
 
@@ -120,26 +115,22 @@ public class CustomerController {
     }
 
     @PostMapping("withdraw/{customerId}")
-    public String withdraw(@PathVariable Long customerId, @ModelAttribute Withdraw withdraw, Model model) {
+    public String withdraw(@PathVariable Long customerId,  @ModelAttribute Withdraw withdraw, BindingResult bindingResult, Model model) {
         Customer customer = customerService.findById(customerId);
         withdraw.setCustomer(customer);
-        if ((withdraw.getTransactionAmount() == null) ||
-                (withdraw.getTransactionAmount().compareTo(BigDecimal.ZERO) <= 0) ||
-                (withdraw.getTransactionAmount().compareTo(customer.getBalance()) > 0)) {
+        new Withdraw().validate(withdraw, bindingResult);
+
+        if (bindingResult.hasErrors()) {
             model.addAttribute("success", false);
-            model.addAttribute("checkValid", false);
-            model.addAttribute("message", "Please input a number bigger 0");
-            model.addAttribute("deposit", withdraw);
-            return "customer/withdraw";
         } else {
             customerService.withdraw(withdraw);
             withdrawService.save(withdraw);
             withdraw.setTransactionAmount(null);
-            model.addAttribute("withdraw", withdraw);
             model.addAttribute("success", true);
-            model.addAttribute("checkValid", true);
             model.addAttribute("message", "Withdraw successfully");
         }
+        model.addAttribute("withdraw", withdraw);
+        model.addAttribute("checkValid", true);
         return "customer/withdraw";
     }
 

@@ -141,5 +141,4 @@ public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
         bean.setValidationMessageSource(messageSource());
         return bean;
     }
-
 }
