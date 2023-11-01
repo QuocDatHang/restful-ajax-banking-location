@@ -53,7 +53,6 @@ public class CustomerController {
         ModelAndView modelAndView = new ModelAndView("customer/create");
         if (bindingResult.hasErrors()) {
             modelAndView.addObject("success", false);
-            modelAndView.addObject("error", true);
             modelAndView.addObject("customer", customer);
         } else {
             customerService.save(customer);
@@ -83,6 +82,8 @@ public class CustomerController {
     public String deposit(@Valid @PathVariable Long customerId, @ModelAttribute Deposit deposit, BindingResult bindingResult, Model model) {
         Customer customer = customerService.findById(customerId);
         deposit.setCustomer(customer);
+        new Deposit().validate(deposit, bindingResult);
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("success", false);
         } else {
@@ -136,19 +137,24 @@ public class CustomerController {
 
     @GetMapping("update/{customerId}")
     public String showUpdate(@PathVariable Long customerId, Model model) {
-        model.addAttribute("customerEdit", customerService.findById(customerId));
+        model.addAttribute("customer", customerService.findById(customerId));
         return "customer/update";
     }
 
     @PostMapping("update/{customerId}")
-    public String update(@PathVariable Long customerId, @ModelAttribute Customer customerEdit, Model model) {
-        Customer customer = customerService.findById(customerId);
-        customerEdit.setBalance(customer.getBalance());
-        customerEdit.setId(customerId);
-        customerService.save(customerEdit);
-        model.addAttribute("customerEdit", customerEdit);
-        model.addAttribute("success", true);
-        model.addAttribute("message", "Update successfully");
+    public String update(@Valid @PathVariable Long customerId, @ModelAttribute Customer customer, BindingResult bindingResult, Model model) {
+        Customer oldCustomer = customerService.findById(customerId);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("success", false);
+            model.addAttribute("customerEdit", customer);
+        } else {
+            customer.setBalance(oldCustomer.getBalance());
+            customer.setId(customerId);
+            customerService.save(customer);
+            model.addAttribute("customer", customer);
+            model.addAttribute("success", true);
+            model.addAttribute("message", "Update successfully");
+        }
         return "customer/update";
     }
 
@@ -166,22 +172,19 @@ public class CustomerController {
 
     @PostMapping("transfer/{senderId}")
     public String transfer(@PathVariable Long senderId, Model model,
-                           @ModelAttribute Transfer transfer, @RequestParam Long recipientId) {
+                           @ModelAttribute Transfer transfer,
+                           @RequestParam Long recipientId, BindingResult bindingResult) {
         Customer sender = customerService.findById(senderId);
         Customer recipient = customerService.findById(recipientId);
         transfer.setFees(10L);
         List<Customer> recipients = customerService.findAllWithoutId(senderId);
         transfer.setSender(sender);
+        new Transfer().validate(transfer, bindingResult);
 
-        if (transfer.getTransferAmount() == null ||
-                transfer.getTransferAmount().compareTo(BigDecimal.ZERO) <= 0 ||
-                transfer.getTransferAmount().multiply(BigDecimal.valueOf(1.1)).compareTo(sender.getBalance()) > 0) {
-
+        if (bindingResult.hasErrors()) {
             model.addAttribute("transfer", transfer);
             model.addAttribute("recipients", recipients);
             model.addAttribute("success", false);
-            model.addAttribute("message", "Transfer failed");
-            return "customer/transfer";
         } else {
             transfer.setFeesAmount(transfer.getTransferAmount().multiply(BigDecimal.valueOf(0.1)));
             transfer.setTransactionAmount(transfer.getTransferAmount().multiply(BigDecimal.valueOf(1.1)));

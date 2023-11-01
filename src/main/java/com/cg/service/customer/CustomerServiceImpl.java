@@ -2,6 +2,7 @@ package com.cg.service.customer;
 
 import com.cg.model.Customer;
 import com.cg.model.Deposit;
+import com.cg.model.Transfer;
 import com.cg.model.Withdraw;
 import com.cg.repository.ICustomerRepository;
 import com.cg.repository.IDepositRepository;
@@ -20,7 +21,6 @@ import java.util.stream.Collectors;
 public class CustomerServiceImpl implements ICustomerService{
     @Autowired
     private ICustomerRepository customerRepository;
-    private IDepositService depositService;
 
     @Override
     public List<Customer> findAll() {
@@ -64,8 +64,12 @@ public class CustomerServiceImpl implements ICustomerService{
         customerRepository.save(customer);
     }
 
+    public void transfer(Transfer transfer) {
+
+    }
+
     @Override
     public List<Customer> findAllWithoutId(Long id) {
-        return customerRepository.findByIdNot(id);
+        return customerRepository.findByIdNotAndDeletedFalse(id);
     }
 }

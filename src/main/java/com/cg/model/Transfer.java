@@ -1,5 +1,8 @@
 package com.cg.model;
 
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -8,7 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-public class Transfer {
+public class Transfer implements Validator {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -115,5 +118,29 @@ public class Transfer {
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
+    }
+
+    @Override
+    public boolean supports(Class<?> aClass) {
+        return false;
+    }
+
+    @Override
+    public void validate(Object o, Errors errors) {
+        Transfer transfer = (Transfer) o;
+        BigDecimal transferAmount = transfer.getTransferAmount();
+        BigDecimal senderBalance = transfer.getSender().getBalance();
+
+        if (transferAmount == null) {
+            errors.rejectValue("transferAmount", "transfer.transferAmount.null");
+            return;
+        }
+        if (transferAmount.compareTo(BigDecimal.ZERO) <= 0 ) {
+            errors.rejectValue("transferAmount", "transfer.transferAmount.min");
+            return;
+        }
+        if (transferAmount.multiply(BigDecimal.valueOf(1.1)).compareTo(senderBalance) > 0) {
+            errors.rejectValue("transferAmount", "transfer.transferAmount.biggerThanBalance");
+        }
     }
 }
