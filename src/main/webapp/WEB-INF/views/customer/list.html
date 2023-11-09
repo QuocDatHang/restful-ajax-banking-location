@@ -1,9 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+
 <head>
     <title>List customer</title>
-    <th:block th:replace="layout/header"/>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/assets/bootstrapv5-3-2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/customize.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <script src="/assets/jquery/jquery-3.7.1.min.js"></script>
+    <script src="/assets/jquery/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </head>
+
 <body>
 <div class="container">
     <header>
@@ -11,92 +20,495 @@
             <div class="container-fluid">
                 <div class="navbar-brand">List of customers</div>
                 <div class="d-flex" style="gap: 10px">
-                    <a href="customers/transferHistories">
-                        <button class="btn btn-outline-light" type="button">
-                            <i class="fas fa-history"></i>
-                            Transfer histories
-                        </button>
-                    </a>
-                    <a href="customers/create">
-                        <button class="btn btn-outline-light" type="button">
-                            <i class="far fa-plus-square"></i>
-                            Add new customer
-                        </button>
-                    </a>
+                    <button class="btn btn-outline-light" type="button">
+                        <i class="fas fa-history"></i>
+                        Transfer histories
+                    </button>
+                    <button class="btn btn-outline-light" type="button" data-bs-toggle="modal"
+                            data-bs-target="#modalCreate">
+                        <i class="far fa-plus-square"></i>
+                        Add new customer
+                    </button>
                 </div>
             </div>
         </nav>
     </header>
 
     <div class="content">
-        <div class="container">
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>FullName</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Address</th>
-                    <th>Balance</th>
-                    <th colspan="5">Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                <th:block th:each="item : ${customers}">
-                    <tr>
-                        <td th:text="${item.id}"></td>
-                        <td th:text="${item.fullName}"></td>
-                        <td th:text="${item.email}"></td>
-                        <td th:text="${item.phone}"></td>
-                        <td th:text="${item.address}"></td>
-                        <td th:text="${item.balance}"></td>
-                        <td>
-                            <a th:href="@{customers/update/__${item.id}__}">
-                                <button class="btn btn-outline-secondary" data-bs-toggle="tooltip"
-                                        data-bs-placement="top" title="Edit">
-                                    <i class="far fa-edit"></i>
-                                </button>
-                            </a>
-                        </td>
-                        <td>
-                            <a th:href="@{customers/deposit/__${item.id}__}">
-                                <button class="btn btn-outline-success" data-bs-toggle="tooltip"
-                                        data-bs-placement="top" title="Deposit">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </a>
-                        </td>
-                        <td>
-                            <a th:href="@{customers/withdraw/__${item.id}__}">
-                                <button class="btn btn-outline-warning" data-bs-toggle="tooltip"
-                                        data-bs-placement="top" title="Withdraw">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                            </a>
-                        </td>
-                        <td>
-                            <a th:href="@{/customers/transfer/__${item.id}__}">
-                                <button class="btn btn-outline-primary" data-bs-toggle="tooltip"
-                                        data-bs-placement="top" title="Transfer money">
-                                    <i class="fas fa-exchange-alt"></i>
-                                </button>
-                            </a>
-                        </td>
-                        <td>
-                            <a th:href="@{/customers/delete/__${item.id}__}" onclick="return confirm('Do you want to delete ?')">
-                            <button class="btn btn-outline-danger" data-bs-toggle="tooltip"
-                                    data-bs-placement="top" title="Ban">
-                                <i class="fas fa-ban"></i>
-                            </button>
-                            </a>
-                        </td>
-                    </tr>
-                </th:block>
-                </tbody>
-            </table>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>FullName</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Province</th>
+                <th>District</th>
+                <th>Ward</th>
+                <th>Address</th>
+                <th>Balance</th>
+                <th colspan="5">Action</th>
+            </tr>
+            </thead>
+            <tbody id="dataCustomer">
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!--========================NOTIFICATION===============================================-->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive"
+         aria-atomic="true">
+        <div class="d-flex">
+            <div id="toast-body" class="toast-body">
+            </div>
+            <button type="button" id="btnCloseToast" class="btn-close btn-close-white me-2 m-auto"
+                    data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
     </div>
 </div>
+
+<!-- MODAL CREATE -->
+<th:block th:replace="customer/modalCreate"/>
+
+<!-- MODAL UPDATE -->
+<th:block th:replace="customer/modalUpdate"/>
+
+<!-- MODAL DEPOSIT -->
+<th:block th:replace="customer/modalDeposit"/>
+
+<!-- MODAL WITHDRAW -->
+<th:block th:replace="customer/modalWithdraw"/>
+
+
+<script>
+
+    const page = {
+        url: {
+            getAllProvinces: 'https://vapi.vnappmob.com/api/province/',
+            getAllDistrictsByProvinceId: 'https://vapi.vnappmob.com/api/province/district/',
+            getAllWardsByDistrictId: 'https://vapi.vnappmob.com/api/province/ward/',
+        },
+        elements: {},
+        commands: {},
+        loadDatas: {}
+    }
+    page.elements.dataCustomer = $('#dataCustomer');
+    page.elements.btnCreate = $("#btnCreate");
+    page.elements.btnUpdate = $("#btnUpdate");
+    page.elements.btnDeposit = $("#btnDeposit");
+    page.elements.btnWithdraw = $("#btnWithdraw");
+    page.elements.modalCreate = $('#modalCreate');
+    page.elements.frmCreate = $('#frmCreate');
+    page.elements.fullNameCre = $('#fullNameCre');
+    page.elements.emailCre = $('#emailCre');
+    page.elements.phoneCre = $('#phoneCre');
+    page.elements.provinceCre = $('#provinceCre');
+    page.elements.districtCre = $('#districtCre');
+    page.elements.wardCre = $('#wardCre');
+    page.elements.addressCre = $('#addressCre');
+
+
+    page.elements.toastLive = $('#liveToast');
+    page.elements.toastBody = $('#toast-body');
+    page.elements.btnCloseToast = $('#btnCloseToast');
+    page.elements.toastBootstrap = bootstrap.Toast.getOrCreateInstance(page.elements.toastLive);
+    let customerId = 0;
+
+
+    async function getAllCustomers() {
+        const customers = await $.ajax({
+            url: "http://localhost:8080/api/customers"
+        });
+
+        $.each(customers, (index, item) => {
+            page.elements.dataCustomer.prepend(renderCustomer(item));
+        })
+
+        addEventUpdate();
+        addEventDelete();
+        addEventDeposit()
+        addEventWithdraw();
+    }
+
+    getAllCustomers();
+
+    const renderCustomer = (obj) => {
+        return `
+                <tr id="tr_${obj.id}">
+                    <th scope="row">${obj.id}</th>
+                    <td>${obj.fullName}</td>
+                    <td>${obj.email}</td>
+                    <td>${obj.phone}</td>
+                    <td>${obj.locationRegion.provinceName}</td>
+                    <td>${obj.locationRegion.districtName}</td>
+                    <td>${obj.locationRegion.wardName}</td>
+                    <td>${obj.locationRegion.address}</td>
+                    <td>${obj.balance}</td>
+                    <td class="text-center">
+                        <button class="btn btn-outline-secondary edit" data-id="${obj.id}">
+                            <i class="fa fa-pencil-alt"></i>
+                        </button>
+                        <button class="btn btn-outline-success deposit" data-id="${obj.id}">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button class="btn btn-outline-warning withdraw" data-id="${obj.id}">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button class="btn btn-outline-primary transfer" data-id="${obj.id}">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                        <button class="btn btn-outline-danger delete"
+                            data-id="${obj.id}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            `
+    }
+
+    // ======================CREATE CUSTOMER========================
+
+    page.elements.btnCreate.on('click', async () => {
+        const fullName = $('#fullNameCre').val();
+        const email = $('#emailCre').val();
+        const phone = $('#phoneCre').val();
+        const address = $('#addressCre').val();
+        const balance = 0;
+        const deleted = 0;
+
+        const obj = {
+            fullName,
+            email,
+            phone,
+            address,
+            balance,
+            deleted
+        }
+
+        const createCustomer = await $.ajax({
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            },
+            url: "http://localhost:8080/api/customers",
+            method: 'POST',
+            data: JSON.stringify(obj)
+        })
+        page.elements.dataCustomer.prepend(renderCustomer(createCustomer));
+        closeModal('modalCreate');
+
+        page.elements.toastBody.text('Thêm mới thành công');
+        page.elements.toastBootstrap.show();
+
+        addEventUpdate();
+        addEventDelete();
+        addEventDeposit()
+        addEventWithdraw();
+
+        setTimeout(() => {
+            page.elements.btnCloseToast.click()
+        }, 2000);
+    })
+
+    // ======================UPDATE CUSTOMER========================
+
+    page.elements.btnUpdate.on('click', async () => {
+        const fullName = $('#fullNameUpdate').val();
+        const email = $('#emailUpdate').val();
+        const phone = $('#phoneUpdate').val();
+        const address = $('#addressUpdate').val();
+
+        const obj = {
+            fullName,
+            email,
+            phone,
+            address
+        }
+
+        const updateCustomer = await $.ajax({
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            },
+            url: "http://localhost:8080/api/customers/" + customerId,
+            method: 'PATCH',
+            data: JSON.stringify(obj)
+        });
+
+        const updateRow = $('#tr_' + customerId);
+        updateRow.replaceWith(renderCustomer(updateCustomer));
+
+        closeModal('modalUpdate');
+
+        page.elements.toastBody.text('Cập nhật thông tin thành công');
+        page.elements.toastBootstrap.show()
+
+        addEventUpdate();
+        addEventDelete();
+        addEventDeposit()
+        addEventWithdraw();
+
+        setTimeout(() => {
+            page.elements.btnCloseToast.click()
+        }, 2500);
+    })
+
+    // ======================DEPOSIT CUSTOMER========================
+
+    page.elements.btnDeposit.on('click', async () => {
+        const fullName = $('#fullNameDeposit').val();
+        const email = $('#emailDeposit').val();
+        var balance = $('#balanceDeposit').val();
+        var transactionAmount = $('#transactionAmountDeposit').val();
+
+        balance = parseFloat(balance);
+        transactionAmount = parseFloat(transactionAmount);
+        if (transactionAmount <= 0 || transactionAmount > 1000000) {
+            return;
+        }
+        balance = balance + transactionAmount;
+
+        const obj = {
+            balance
+        }
+
+        const response = await fetch("http://localhost:8080/api/customers/" + customerId, {
+            method: 'PATCH',
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            },
+            body: JSON.stringify(obj)
+        });
+        const depositCustomer = await response.json();
+
+        const updateRow = $('#tr_' + customerId)
+        updateRow.replaceWith(renderCustomer(depositCustomer));
+
+        closeModal('modalDeposit');
+        page.elements.toastBody.text('Nạp tiền thành công');
+        page.elements.toastBootstrap.show();
+
+        addEventUpdate();
+        addEventDelete();
+        addEventDeposit()
+        addEventWithdraw();
+
+        setTimeout(() => {
+            page.elements.btnCloseToast.click()
+        }, 2500);
+    })
+
+    // ======================WITHDRAW CUSTOMER========================
+
+    page.elements.btnWithdraw.on('click', async () => {
+        const fullName = $('#fullNameWithdraw').val();
+        const email = $('#emailWithdraw').val();
+        var balance = $('#balanceWithdraw').val();
+        var transactionAmount = $('#transactionAmountWithdraw').val();
+
+        balance = parseFloat(balance);
+        transactionAmount = parseFloat(transactionAmount);
+        if (transactionAmount > balance || transactionAmount <= 0) {
+            return;
+        }
+        balance = balance - transactionAmount;
+
+        const obj = {
+            balance
+        }
+
+        const response = await fetch("http://localhost:8080/api/customers/" + customerId, {
+            method: 'PATCH',
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            },
+            body: JSON.stringify(obj)
+        });
+        const withdrawCustomer = await response.json();
+
+        const updateRow = $('#tr_' + customerId)
+        updateRow.replaceWith(renderCustomer(withdrawCustomer));
+
+        closeModal('modalWithdraw');
+        page.elements.toastBody.text('Rut tiền thành công')
+        page.elements.toastBootstrap.show()
+
+        addEventUpdate();
+        addEventDelete();
+        addEventDeposit()
+        addEventWithdraw();
+
+        setTimeout(() => {
+            page.elements.btnCloseToast.click()
+        }, 2500);
+    })
+
+
+    const getCustomerById = async (customerId) => {
+        const response = await fetch("http://localhost:8080/api/customers/" + customerId);
+        const customer = await response.json();
+        return customer;
+    }
+
+    function closeModal(elem) {
+        document.getElementById(elem).style.display = "none"
+        document.getElementById(elem).classList.remove("show")
+        document.querySelector('.modal-backdrop').remove();
+        document.querySelector('body').setAttribute('style', 'overflow: none')
+    }
+
+    function addEventUpdate() {
+        const btnUpdateElems = $('.edit');
+        btnUpdateElems.off('click');
+        $.each(btnUpdateElems, (index, item) => {
+            $(item).on('click', async () => {
+                customerId = $(item).data('id')
+                const customer = await getCustomerById(customerId);
+
+                $('#modalUpdate').modal('show');
+
+                $('#fullNameUpdate').val(customer.fullName);
+                $('#emailUpdate').val(customer.email);
+                $('#phoneUpdate').val(customer.phone);
+                $('#addressUpdate').val(customer.address);
+            })
+        })
+    }
+
+    function addEventWithdraw() {
+        const btnShowWithdraw = $('.withdraw')
+        btnShowWithdraw.off('click');
+        $.each(btnShowWithdraw, (index, item) => {
+            $(item).on('click', async () => {
+                customerId = $(item).data('id')
+                const customer = await getCustomerById(customerId);
+                $('#modalWithdraw').modal('show');
+                $('#fullNameWithdraw').val(customer.fullName);
+                $('#emailWithdraw').val(customer.email);
+                $('#balanceWithdraw').val(customer.balance);
+            })
+        })
+    }
+
+    function addEventDeposit() {
+        const btnShowDeposit = $('.deposit')
+        btnShowDeposit.off('click');
+        $.each(btnShowDeposit, (index, item) => {
+            $(item).on('click', async () => {
+                customerId = $(item).data('id');
+                const customer = await getCustomerById(customerId);
+                $('#modalDeposit').modal('show');
+
+                $('#fullNameDeposit').val(customer.fullName);
+                $('#emailDeposit').val(customer.email);
+                $('#balanceDeposit').val(customer.balance);
+            })
+        })
+    }
+
+    function addEventDelete() {
+        const btnDelete = $('.delete');
+        btnDelete.off('click');
+        $.each(btnDelete, (index, item) => {
+            $(item).on('click', async () => {
+                customerId = $(item).data('id')
+
+                await $.ajax({
+                    url: "http://localhost:8080/api/customers/" + customerId,
+                    method: 'DELETE'
+                }).done(() => {
+                    $('#tr_' + customerId).remove();
+                    page.elements.toastBody.text('Xoá khách hàng thành công');
+                    page.elements.toastBootstrap.show();
+
+                    setTimeout(() => {
+                        page.elements.btnCloseToast.click()
+                    }, 2500);
+                })
+            })
+        })
+    }
+
+    page.commands.getAllProvinces = () => {
+        return $.ajax({
+            url: page.url.getAllProvinces
+        })
+            .done((data) => {
+                const provinces = data.results;
+
+                $.each(provinces, (index, item) => {
+                    const str = `<option value="${item.province_id}">${item.province_name}</option>`
+
+                    page.elements.provinceCre.append(str)
+                })
+            })
+    }
+
+    page.commands.getAllDistricts = (provinceId) => {
+        return $.ajax({
+            url: page.url.getAllDistrictsByProvinceId + provinceId
+        })
+            .done((data) => {
+                page.elements.districtCre.empty();
+
+                const districts = data.results;
+
+                $.each(districts, (index, item) => {
+                    const str = `<option value="${item.district_id}">${item.district_name}</option>`
+
+                    page.elements.districtCre.append(str)
+                })
+            })
+    }
+
+    page.commands.getAllWards = (districtId) => {
+        $.ajax({
+            url: page.url.getAllWardsByDistrictId + districtId
+        })
+            .done((data) => {
+                page.elements.wardCre.empty();
+
+                const wards = data.results;
+
+                $.each(wards, (index, item) => {
+                    const str = `<option value="${item.ward_id}">${item.ward_name}</option>`
+
+                    page.elements.wardCre.append(str)
+                })
+            })
+    }
+
+
+    page.elements.provinceCre.on('change', function () {
+        const provinceId = $(this).val()
+
+        page.commands.getAllDistricts(provinceId).then(() => {
+            const districtId = page.elements.districtCre.find('option:selected').val()
+
+            page.commands.getAllWards(districtId)
+        })
+    })
+
+    page.elements.districtCre.on('change',  function () {
+        const districtId = $(this).val()
+
+        page.commands.getAllWards(districtId)
+    })
+
+
+    $(() => {
+        page.commands.getAllProvinces().then(() => {
+            const provinceId = page.elements.provinceCre.find('option:selected').val()
+
+            page.commands.getAllDistricts(provinceId).then(() => {
+                const districtId = page.elements.districtCre.find('option:selected').val()
+
+                page.commands.getAllWards(districtId)
+            })
+        })
+    })
+</script>
 </body>
+
 </html>

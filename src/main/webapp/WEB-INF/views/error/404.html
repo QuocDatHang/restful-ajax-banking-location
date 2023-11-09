@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+    <meta charset="UTF-8">
+    <title>Error Page</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel="stylesheet" href="/assets/css/CSS404.css">
+
+</head>
+
+<body>
+
+<div id='oopss'>
+    <div id='error-text'>
+        <img src="https://cdn.rawgit.com/ahmedhosna95/upload/1731955f/sad404.svg" alt="404">
+        <div th:text="${errorMsg}"></div>
+        <div class="backtomenu">
+            <p class="p-a">
+                . The page you were looking for could not be found
+            </p>
+            <a href='/customers' class="back">... Back to previous page</a>
+        </div>
+
+    </div>
+</div>
+</body>
+
+</html>

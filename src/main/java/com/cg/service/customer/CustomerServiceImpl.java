@@ -4,9 +4,9 @@ import com.cg.model.Customer;
 import com.cg.model.Deposit;
 import com.cg.model.Transfer;
 import com.cg.model.Withdraw;
+
 import com.cg.repository.ICustomerRepository;
-import com.cg.repository.IDepositRepository;
-import com.cg.service.deposit.IDepositService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -72,4 +72,9 @@ public class CustomerServiceImpl implements ICustomerService{
     public List<Customer> findAllWithoutId(Long id) {
         return customerRepository.findByIdNotAndDeletedFalse(id);
     }
+
+//    @Override
+//    public List<CustomerResDTO> findAllCustomerResDTO() {
+//        return customerRepository.findAllCustomerResDTO();
+//    }
 }

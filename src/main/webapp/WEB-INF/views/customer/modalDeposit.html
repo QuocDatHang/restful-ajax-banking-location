@@ -1,0 +1,44 @@
+<th:block th:fragment="modalDeposit">
+    <div class="modal fade" id="modalDeposit" tabindex="1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Deposit Customer</h1>
+                </div>
+                <div class="modal-body">
+                    <form method="post">
+                        <div class="row mb-3 mt-3">
+                            <div class="col-lg-6">
+                                <label for="fullNameDeposit" class="form-label fw-bold">Full Name</label>
+                                <input type="text" class="form-control" id="fullNameDeposit" readonly>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="emailDeposit" class="form-label fw-bold">Email</label>
+                                <input type="email" class="form-control" id="emailDeposit" readonly>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-lg-6">
+                                <label for="balanceDeposit" class="form-label fw-bold">Current balance</label>
+                                <input type="text" class="form-control" id="balanceDeposit" disabled>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="transactionAmountDeposit" class="form-label fw-bold">Transaction amount</label>
+                                <input type="number" class="form-control" id="transactionAmountDeposit">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCloseDeposit" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Close
+                    </button>
+                    <button type="button" class="btn btn-success" id="btnDeposit">
+                        <i class="fas fa-plus"></i>
+                        Deposit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>

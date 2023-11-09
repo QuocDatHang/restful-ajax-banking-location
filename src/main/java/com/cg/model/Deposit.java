@@ -1,5 +1,9 @@
 package com.cg.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -8,6 +12,11 @@ import javax.validation.constraints.*;
 import java.math.BigDecimal;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "deposits")
 public class Deposit implements Validator{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,47 +32,6 @@ public class Deposit implements Validator{
     @Column(columnDefinition = "boolean default false")
     private Boolean deleted;
 
-    public Deposit() {
-    }
-
-    public Deposit(Long id, Customer customer, BigDecimal transactionAmount, Boolean deleted) {
-        this.id = id;
-        this.customer = customer;
-        this.transactionAmount = transactionAmount;
-        this.deleted = deleted;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
-
-    public BigDecimal getTransactionAmount() {
-        return transactionAmount;
-    }
-
-    public void setTransactionAmount(BigDecimal transactionAmount) {
-        this.transactionAmount = transactionAmount;
-    }
-
-    public Boolean getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
-    }
 
     @Override
     public boolean supports(Class<?> aClass) {

@@ -1,0 +1,42 @@
+<th:block th:fragment="modalUpdate">
+    <div class="modal fade" id="modalUpdate" tabindex="1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Update Customer</h1>
+                </div>
+                <div class="modal-body">
+                    <form method="post">
+                        <div class="row mb-3 mt-3">
+                            <div class="col-lg-6">
+                                <label for="fullNameUpdate">Full Name</label>
+                                <input type="text" class="form-control" id="fullNameUpdate">
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="emailUpdate">Email</label>
+                                <input type="email" class="form-control" id="emailUpdate">
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="phoneUpdate">Phone</label>
+                                <input type="tel" class="form-control" id="phoneUpdate">
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="addressUpdate">Address</label>
+                                <input type="text" class="form-control" id="addressUpdate">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCloseUpdate" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Close
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="btnUpdate">
+                        <i class="fas fa-plus"></i>
+                        Update
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>

@@ -1,5 +1,9 @@
 package com.cg.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -11,6 +15,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "transfers")
 public class Transfer implements Validator {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,94 +43,9 @@ public class Transfer implements Validator {
     @Column(name = "create_at", columnDefinition = "DATETIME")
     private LocalDateTime createAt;
 
-    public Transfer() {
-    }
-
-    public Transfer(Long id, Customer sender, Customer recipient, BigDecimal transferAmount, Long fees, BigDecimal feesAmount, BigDecimal transactionAmount, Boolean deleted) {
-        this.id = id;
-        this.sender = sender;
-        this.recipient = recipient;
-        this.transferAmount = transferAmount;
-        this.fees = fees;
-        this.feesAmount = feesAmount;
-        this.transactionAmount = transactionAmount;
-        this.deleted = deleted;
-    }
-
-    public LocalDateTime getCreateAt() {
-        return createAt;
-    }
-
-    public void setCreateAt(LocalDateTime createAt) {
-        this.createAt = createAt;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Customer getSender() {
-        return sender;
-    }
-
-    public void setSender(Customer sender) {
-        this.sender = sender;
-    }
-
-    public Customer getRecipient() {
-        return recipient;
-    }
-
-    public void setRecipient(Customer recipient) {
-        this.recipient = recipient;
-    }
-
-    public BigDecimal getTransferAmount() {
-        return transferAmount;
-    }
-
-    public void setTransferAmount(BigDecimal transferAmount) {
-        this.transferAmount = transferAmount;
-    }
-
-    public Long getFees() {
-        return fees;
-    }
-
-    public void setFees(Long fees) {
-        this.fees = fees;
-    }
-
-    public BigDecimal getFeesAmount() {
-        return feesAmount;
-    }
-
-    public void setFeesAmount(BigDecimal feesAmount) {
-        this.feesAmount = feesAmount;
-    }
-
-    public BigDecimal getTransactionAmount() {
-        return transactionAmount;
-    }
-
-    public void setTransactionAmount(BigDecimal transactionAmount) {
-        this.transactionAmount = transactionAmount;
-    }
-
-    public Boolean getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
-    }
 
     @Override
-    public boolean supports(Class<?> aClass) {
+    public boolean supports(Class<?> clazz) {
         return false;
     }
 
@@ -135,7 +59,7 @@ public class Transfer implements Validator {
             errors.rejectValue("transferAmount", "transfer.transferAmount.null");
             return;
         }
-        if (transferAmount.compareTo(BigDecimal.ZERO) <= 0 ) {
+        if (transferAmount.compareTo(BigDecimal.ZERO) <= 0) {
             errors.rejectValue("transferAmount", "transfer.transferAmount.min");
             return;
         }
