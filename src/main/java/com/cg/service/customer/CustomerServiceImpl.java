@@ -1,12 +1,10 @@
 package com.cg.service.customer;
 
-import com.cg.model.Customer;
-import com.cg.model.Deposit;
-import com.cg.model.Transfer;
-import com.cg.model.Withdraw;
+import com.cg.model.*;
 
 import com.cg.repository.ICustomerRepository;
 
+import com.cg.repository.ILocationRegionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 @Service
 @Transactional
-public class CustomerServiceImpl implements ICustomerService{
+public class CustomerServiceImpl implements ICustomerService {
     @Autowired
     private ICustomerRepository customerRepository;
+    private ILocationRegionRepository locationRegionRepository;
 
     @Override
     public List<Customer> findAll() {
@@ -33,9 +33,18 @@ public class CustomerServiceImpl implements ICustomerService{
     }
 
     @Override
+    public void create(Customer customer) {
+        LocationRegion locationRegion = customer.getLocationRegion();
+        locationRegionRepository.save(locationRegion);
+
+        customer.setLocationRegion(locationRegion);
+        customerRepository.save(customer);
+    }
+
+    @Override
     public void save(Customer customer) {
-        if (customer.getBalance() == null){
-        customer.setBalance(BigDecimal.ZERO);
+        if (customer.getBalance() == null) {
+            customer.setBalance(BigDecimal.ZERO);
         }
         customer.setDeleted(false);
         customerRepository.save(customer);
@@ -47,6 +56,7 @@ public class CustomerServiceImpl implements ICustomerService{
         assert customer != null;
         customer.setDeleted(true);
     }
+
     public void deposit(Deposit deposit) {
         Customer customer = deposit.getCustomer();
         BigDecimal currentBalance = customer.getBalance();
@@ -55,6 +65,7 @@ public class CustomerServiceImpl implements ICustomerService{
         customer.setBalance(newBalance);
         customerRepository.save(customer);
     }
+
     public void withdraw(Withdraw withdraw) {
         Customer customer = withdraw.getCustomer();
         BigDecimal currentBalance = customer.getBalance();
@@ -64,6 +75,7 @@ public class CustomerServiceImpl implements ICustomerService{
         customerRepository.save(customer);
     }
 
+    @Override
     public void transfer(Transfer transfer) {
 
     }
