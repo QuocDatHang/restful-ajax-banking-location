@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class CustomerServiceImpl implements ICustomerService {
     @Autowired
     private ICustomerRepository customerRepository;
+    @Autowired
     private ILocationRegionRepository locationRegionRepository;
 
     @Override

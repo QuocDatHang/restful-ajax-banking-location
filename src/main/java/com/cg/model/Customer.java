@@ -30,6 +30,7 @@ public class Customer {
     @NotBlank(message = "Số điện thoại không được để trống")
     private String phone;
     @OneToOne
+    @JoinColumn(name = "location_region_id", referencedColumnName = "id", nullable = false)
     private LocationRegion locationRegion;
     @Column(columnDefinition = "decimal(10,2) default '0.00' ")
     private BigDecimal balance;

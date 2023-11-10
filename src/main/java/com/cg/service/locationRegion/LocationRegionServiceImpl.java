@@ -14,7 +14,7 @@ import java.util.List;
 public class LocationRegionServiceImpl implements ILocationRegionService {
 
     @Autowired
-    private ILocationRegionRepository ILocationRegionRepository;
+    private ILocationRegionRepository locationRegionRepository;
 
 
     @Override
@@ -29,7 +29,7 @@ public class LocationRegionServiceImpl implements ILocationRegionService {
 
     @Override
     public void save(LocationRegion locationRegion) {
-        ILocationRegionRepository.save(locationRegion);
+        locationRegionRepository.save(locationRegion);
     }
 
     @Override

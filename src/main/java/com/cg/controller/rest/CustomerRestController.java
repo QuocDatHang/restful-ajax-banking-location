@@ -34,6 +34,13 @@ public class CustomerRestController {
         return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 
+    @GetMapping("/{customerId}")
+    public ResponseEntity<?> findById(@PathVariable Long customerId) {
+        Customer customer = customerService.findById(customerId);
+        CustomerResDTO customerResDTO = customer.toCustomerResDTO();
+        return new ResponseEntity<>(customerResDTO, HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<?> create(@Validated @RequestBody CustomerCreReqDTO customerCreReqDTO, BindingResult bindingResult) {
         new CustomerCreReqDTO().validate(customerCreReqDTO, bindingResult);
@@ -46,8 +53,6 @@ public class CustomerRestController {
         customer.setDeleted(false);
 
         customerService.create(customer);
-
-
         return new ResponseEntity<>(customer, HttpStatus.CREATED);
     }
 

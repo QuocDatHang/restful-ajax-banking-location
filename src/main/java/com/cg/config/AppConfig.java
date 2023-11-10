@@ -98,7 +98,7 @@ public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
     public DataSource getDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/restful-ajax-banking-location?characterEncoding=UTF-8");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/c0623_banking_location?characterEncoding=UTF-8");
         dataSource.setUsername("root");
         dataSource.setPassword("123456");
         return dataSource;

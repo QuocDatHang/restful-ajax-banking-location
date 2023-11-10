@@ -1,28 +1,46 @@
 <th:block th:fragment="modalUpdate">
     <div class="modal fade" id="modalUpdate" tabindex="1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5">Update Customer</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="post">
+                    <div class="area-error hide">
+
+                    </div>
+                    <form id="frmUpdate" method="post">
                         <div class="row mb-3 mt-3">
-                            <div class="col-lg-6">
-                                <label for="fullNameUpdate">Full Name</label>
-                                <input type="text" class="form-control" id="fullNameUpdate">
+                            <div class="col-lg-4">
+                                <label for="fullNameUpdate" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="fullNameUpdate" name="fullNameUpdate">
                             </div>
-                            <div class="col-lg-6">
-                                <label for="emailUpdate">Email</label>
+                            <div class="col-lg-4">
+                                <label for="emailUpdate" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="emailUpdate">
                             </div>
-                            <div class="col-lg-6">
-                                <label for="phoneUpdate">Phone</label>
+                            <div class="col-lg-4">
+                                <label for="phoneUpdate" class="form-label">Phone</label>
                                 <input type="tel" class="form-control" id="phoneUpdate">
                             </div>
-                            <div class="col-lg-6">
-                                <label for="addressUpdate">Address</label>
-                                <input type="text" class="form-control" id="addressUpdate">
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-lg-3">
+                                <label for="provinceUpdate" class="form-label">Province</label>
+                                <select id="provinceUpdate" class="form-select"></select>
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="districtUpdate" class="form-label">District</label>
+                                <select id="districtUpdate" class="form-select"></select>
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="wardUpdate" class="form-label">Ward</label>
+                                <select id="wardUpdate" class="form-select"></select>
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="addressUpdate" class="form-label">Address</label>
+                                <input type="text" class="form-control" id="addressUpdate" name="addressUpdate">
                             </div>
                         </div>
                     </form>

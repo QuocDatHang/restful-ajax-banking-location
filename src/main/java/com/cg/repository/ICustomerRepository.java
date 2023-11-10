@@ -11,14 +11,6 @@ public interface ICustomerRepository extends JpaRepository<Customer, Long> {
     List<Customer> findByIdNotAndDeletedFalse(Long id);
 
     List<Customer> findCustomersByDeletedIsFalse();
-//    @Query("SELECT NEW com.cg.model.dto.response.CustomerResDTO (" +
-//            "cus.id, " +
-//            "cus.fullName, " +
-//            "cus.email, " +
-//            "cus.phone, " +
-//            "cus.balance, " +
-//            "cus.locationRegion" +
-//            ") FROM Customer AS cus "
-//    )
+
 
 }
