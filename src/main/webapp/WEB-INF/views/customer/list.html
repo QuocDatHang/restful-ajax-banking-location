@@ -99,6 +99,9 @@
             getAllProvinces: 'https://vapi.vnappmob.com/api/province/',
             getAllDistrictsByProvinceId: 'https://vapi.vnappmob.com/api/province/district/',
             getAllWardsByDistrictId: 'https://vapi.vnappmob.com/api/province/ward/',
+            createCustomer: 'http://localhost:8080/api/customers',
+            updateCustomer: 'http://localhost:8080/api/customers',
+            getCustomerById: 'http://localhost:8080/api/customers/'
         },
         elements: {},
         commands: {},
@@ -129,6 +132,8 @@
     page.elements.wardUpdate = $('#wardUpdate');
     page.elements.addressUpdate = $('#addressUpdate');
     page.elements.btnUpdate = $('#btnUpdate');
+
+    page.elements.modalDeposit = $('#modalDeposit');
 
     page.elements.loading = $('#loading');
 
@@ -248,39 +253,101 @@
                     setTimeout(() => {
                         page.elements.btnCloseToast.click()
                     }, 2000);
-                });
+                })
+                .always(() => {
+                    page.elements.btnCreate.prop("disabled", false);
+                })
         }, 1000);
-
-
     })
 
     // ======================UPDATE CUSTOMER========================
 
     page.elements.btnUpdate.on('click', async () => {
+        page.elements.btnUpdate.prop("disabled", true);
+
+        const provinceId = page.elements.provinceUpdate.val()
+        const provinceName = page.elements.provinceUpdate.find('option:selected').text();
+        const districtId = page.elements.districtUpdate.val()
+        const districtName = page.elements.districtUpdate.find('option:selected').text();
+        const wardId = page.elements.wardUpdate.val()
+        const wardName = page.elements.wardUpdate.find('option:selected').text();
+        const address = page.elements.addressUpdate.val()
+
+        const locationRegion = {
+            provinceId,
+            provinceName,
+            districtId,
+            districtName,
+            wardId,
+            wardName,
+            address
+        }
+
+        const fullName = page.elements.fullNameUpdate.val()
+        const phone = page.elements.phoneUpdate.val()
+
+        const customer = {
+            fullName,
+            phone,
+            locationRegion
+        }
+
         $.ajax({
-            url: "http://localhost:8080/api/customers/" + customerId
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            },
+            type: 'PATCH',
+            url: page.url.updateCustomer + '/' + customerId,
+            data: JSON.stringify(customer)
         })
-            .done(async (data) => {
-                page.elements.fullNameUpdate.val(data.fullName)
-                page.elements.emailUpdate.val(data.email)
-                page.elements.phoneUpdate.val(data.phone)
-                page.elements.provinceUpdate.val(data.locationRegion.provinceId)
+            .done((data) => {
+                console.log(data)
+                const updateRow = $('#tr_' + customerId)
+                const str = page.commands.renderCustomer(data)
+                updateRow.replaceWith(str)
 
-                await page.commands.getAllDistricts(data.locationRegion.provinceId, page.elements.districtUpdate)
+                page.elements.modalUpdate.modal('hide');
+                page.elements.toastBody.text('Chỉnh sửa thành công');
+                page.elements.toastBootstrap.show();
 
-                await page.commands.getAllWards(data.locationRegion.districtId, page.elements.wardUpdate)
-
-                page.elements.modalUpdate.modal('show');
             })
             .fail((err) => {
+                const responseJSON = err.responseJSON
 
+                if (responseJSON) {
+                    let str = '<ul>'
+                    $.each(responseJSON, (k, v) => {
+                        if (k.includes('.')) {
+                            str += `<li><label for="${k.split('.')[1] + 'Cre'}">${v}</label></li>`
+                        } else {
+                            str += `<li><label for="${k + 'Up'}">${v}</label></li>`
+                        }
+
+                    })
+
+                    str += '</ul>'
+
+                    $('#modalUpdate .area-error').append(str).removeClass('hide').css('display', '')
+                }
             })
+            .always(() => {
+                page.elements.btnUpdate.prop("disabled", false);
+                page.elements.loading.addClass('hide')
+            });
 
         addEventUpdate();
         addEventDelete();
         addEventDeposit()
         addEventWithdraw();
     })
+
+    // page.elements.btnCreate.on('click', async () => {
+    //     page.elements.frmCreate.trigger('submit')
+    // })
+    //
+    // page.elements.btnUpdate.on('click', async () => {
+    //     page.elements.frmUpdate.trigger('submit');
+    // })
 
     // ======================DEPOSIT CUSTOMER========================
 
@@ -313,7 +380,7 @@
         const updateRow = $('#tr_' + customerId)
         updateRow.replaceWith(renderCustomer(depositCustomer));
 
-        closeModal('modalDeposit');
+        page.elements.modalDeposit.modal('hide');
         page.elements.toastBody.text('Nạp tiền thành công');
         page.elements.toastBootstrap.show();
 
@@ -356,7 +423,7 @@
         const withdrawCustomer = await response.json();
 
         const updateRow = $('#tr_' + customerId)
-        updateRow.replaceWith(renderCustomer(withdrawCustomer));
+        updateRow.replaceWith(page.commands.renderCustomer(withdrawCustomer));
 
         closeModal('modalWithdraw');
         page.elements.toastBody.text('Rut tiền thành công')
@@ -373,18 +440,12 @@
     })
 
 
-    const getCustomerById = async (customerId) => {
-        const response = await fetch("http://localhost:8080/api/customers/" + customerId);
-        const customer = await response.json();
-        return customer;
+    page.loadData.getCustomerById = async () => {
+        return await $.ajax({
+            url: page.url.getCustomerById + customerId,
+        })
     }
 
-    function closeModal(elem) {
-        document.getElementById(elem).style.display = "none"
-        document.getElementById(elem).classList.remove("show")
-        document.querySelector('.modal-backdrop').remove();
-        document.querySelector('body').setAttribute('style', 'overflow: none')
-    }
 
     function addEventUpdate() {
         const btnUpdateElems = $('.edit');
@@ -392,19 +453,23 @@
         $.each(btnUpdateElems, (index, item) => {
             $(item).on('click', async () => {
                 customerId = $(item).data('id')
-                const customer = await getCustomerById(customerId);
+                const customer = await page.loadData.getCustomerById(customerId);
+                console.log(customer)
 
                 page.elements.fullNameUpdate.val(customer.fullName);
                 page.elements.emailUpdate.val(customer.email);
                 page.elements.phoneUpdate.val(customer.phone);
-                await page.elements.provinceUpdate.val(customer.locationRegion.provinceId);
-                await page.commands.getAllDistricts(customer.locationRegion.provinceId, page.elements.districtUpdate)
-                page.elements.districtUpdate.val(customer.locationRegion.districtId);
-                await page.commands.getAllWards(customer.locationRegion.districtId, page.elements.wardUpdate)
-                page.elements.wardUpdate.val(customer.locationRegion.wardId);
-                page.elements.addressUpdate.val(customer.locationRegion.address);
-                page.elements.modalUpdate.modal('show');
+                page.elements.addressUpdate.val(customer.locationRegion.address)
 
+                page.elements.provinceUpdate.val(customer.locationRegion.provinceId);
+
+                await page.commands.getAllDistricts(customer.locationRegion.provinceId, page.elements.districtUpdate);
+                await page.elements.districtUpdate.val(customer.locationRegion.districtId);
+
+                await page.commands.getAllWards(customer.locationRegion.districtId, page.elements.wardUpdate);
+                await page.elements.wardUpdate.val(customer.locationRegion.wardId);
+
+                page.elements.modalUpdate.modal('show');
             })
         })
     }
@@ -513,35 +578,35 @@
             })
     }
 
-
     page.elements.provinceCre.on('change', async function () {
         const provinceId = $(this).val()
 
-        await page.commands.getAllDistricts(provinceId)
+        await page.commands.getAllDistricts(provinceId, page.elements.districtCre)
         const districtId = page.elements.districtCre.find('option:selected').val()
 
-        page.commands.getAllWards(districtId)
+        page.commands.getAllWards(districtId, page.elements.wardCre)
 
     })
+
     page.elements.provinceUpdate.on('change', async function () {
         const provinceId = $(this).val()
 
-        await page.commands.getAllDistricts(provinceId)
+        await page.commands.getAllDistricts(provinceId, page.elements.districtUpdate)
         const districtId = page.elements.districtUpdate.find('option:selected').val()
 
-        page.commands.getAllWards(districtId)
+        page.commands.getAllWards(districtId, page.elements.wardUpdate)
     })
 
     page.elements.districtCre.on('change', function () {
         const districtId = $(this).val()
 
-        page.commands.getAllWards(districtId)
+        page.commands.getAllWards(districtId, page.elements.wardCre)
     })
 
     page.elements.districtUpdate.on('change', function () {
         const districtId = $(this).val()
 
-        page.commands.getAllWards(districtId)
+        page.commands.getAllWards(districtId, page.elements.wardUpdate)
     })
 
 

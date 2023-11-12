@@ -2,6 +2,7 @@ package com.cg.service.customer;
 
 import com.cg.model.*;
 
+import com.cg.model.dto.CustomerUpReqDTO;
 import com.cg.repository.ICustomerRepository;
 
 import com.cg.repository.ILocationRegionRepository;
@@ -39,6 +40,18 @@ public class CustomerServiceImpl implements ICustomerService {
         locationRegionRepository.save(locationRegion);
 
         customer.setLocationRegion(locationRegion);
+        customerRepository.save(customer);
+    }
+
+    @Override
+    public void update(Long customerId, Long locationRegionId, CustomerUpReqDTO customerUpReqDTO) {
+        Customer customer = customerUpReqDTO.toCustomer(customerId);
+        LocationRegion locationRegion = customer.getLocationRegion();
+        locationRegion.setId(locationRegionId);
+        locationRegionRepository.save(locationRegion);
+
+        customer.setId(customerId);
+        customer.setDeleted(false);
         customerRepository.save(customer);
     }
 

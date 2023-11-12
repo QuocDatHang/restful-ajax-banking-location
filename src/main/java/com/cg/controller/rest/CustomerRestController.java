@@ -1,10 +1,12 @@
 package com.cg.controller.rest;
 
+import com.cg.exception.DataInputException;
 import com.cg.model.Customer;
 import com.cg.model.Deposit;
 import com.cg.model.Withdraw;
 import com.cg.model.dto.CustomerCreReqDTO;
 import com.cg.model.dto.CustomerResDTO;
+import com.cg.model.dto.CustomerUpReqDTO;
 import com.cg.service.customer.ICustomerService;
 import com.cg.utils.AppUtils;
 import lombok.AllArgsConstructor;
@@ -56,4 +58,18 @@ public class CustomerRestController {
         return new ResponseEntity<>(customer, HttpStatus.CREATED);
     }
 
+    @PatchMapping("/{customerId}")
+    public ResponseEntity<?> update(@PathVariable Long customerId, @Validated @RequestBody CustomerUpReqDTO customerUpReqDTO, BindingResult bindingResult) {
+        Customer customer = customerService.findById(customerId);
+        if (customer == null) {
+            throw new DataInputException("Customer not found");
+        }
+        new CustomerUpReqDTO().validate(customerUpReqDTO, bindingResult);
+        if (bindingResult.hasErrors()) {
+            return appUtils.mapErrorToResponse(bindingResult);
+        }
+        customerService.update(customerId, customer.getLocationRegion().getId(), customerUpReqDTO);
+        customer = customerService.findById(customerId);
+        return new ResponseEntity<>(customer.toCustomerResDTO(), HttpStatus.OK);
+    }
 }
