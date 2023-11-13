@@ -22,7 +22,7 @@ public class Withdraw implements Validator {
     @ManyToOne
     @JoinColumn(name = "customer_id", referencedColumnName = "id", nullable = false)
     private Customer customer;
-    @Column(name = "transaction_ammount", columnDefinition = "decimal(10,2)")
+    @Column(name = "transaction_ammount", columnDefinition = "decimal(10,0)")
     private BigDecimal transactionAmount;
     @Column(columnDefinition = "boolean default false")
     private Boolean deleted;

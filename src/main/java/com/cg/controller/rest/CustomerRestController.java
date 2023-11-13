@@ -7,6 +7,7 @@ import com.cg.model.Withdraw;
 import com.cg.model.dto.CustomerCreReqDTO;
 import com.cg.model.dto.CustomerResDTO;
 import com.cg.model.dto.CustomerUpReqDTO;
+import com.cg.model.dto.DepositReqDTO;
 import com.cg.service.customer.ICustomerService;
 import com.cg.utils.AppUtils;
 import lombok.AllArgsConstructor;
@@ -69,6 +70,18 @@ public class CustomerRestController {
             return appUtils.mapErrorToResponse(bindingResult);
         }
         customerService.update(customerId, customer.getLocationRegion().getId(), customerUpReqDTO);
+        customer = customerService.findById(customerId);
+        return new ResponseEntity<>(customer.toCustomerResDTO(), HttpStatus.OK);
+    }
+
+    @PostMapping("/deposit/{customerId}")
+    public ResponseEntity<?> deposit(@PathVariable Long customerId, @RequestBody DepositReqDTO depositReqDTO, BindingResult bindingResult) {
+        Customer customer = customerService.findById(customerId);
+        if (customer == null) {
+            throw new DataInputException("Customer not found");
+        }
+
+
         customer = customerService.findById(customerId);
         return new ResponseEntity<>(customer.toCustomerResDTO(), HttpStatus.OK);
     }

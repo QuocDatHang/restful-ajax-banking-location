@@ -24,10 +24,7 @@ public class Deposit implements Validator{
     @ManyToOne
     @JoinColumn(name = "customer_id", referencedColumnName = "id", nullable = false)
     private Customer customer;
-    @Column(name = "transaction_ammount", columnDefinition = "decimal(10,2)")
-//    @DecimalMin(value = "0.0", message = "Số tiền nạp phải lớn hơn 0")
-//    @DecimalMax(value = "1000000.0", message = "Số tiền nạp tối đa là 1.000.000")
-//    @NotBlank(message = "Số tiền nạp không được để trống")
+    @Column(name = "transaction_ammount", columnDefinition = "decimal(10,0)")
     private BigDecimal transactionAmount;
     @Column(columnDefinition = "boolean default false")
     private Boolean deleted;

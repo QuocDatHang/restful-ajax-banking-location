@@ -101,6 +101,7 @@
             getAllWardsByDistrictId: 'https://vapi.vnappmob.com/api/province/ward/',
             createCustomer: 'http://localhost:8080/api/customers',
             updateCustomer: 'http://localhost:8080/api/customers',
+            depositCustomer: 'http://localhost:8080/api/customers',
             getCustomerById: 'http://localhost:8080/api/customers/'
         },
         elements: {},
@@ -134,6 +135,10 @@
     page.elements.btnUpdate = $('#btnUpdate');
 
     page.elements.modalDeposit = $('#modalDeposit');
+    page.elements.fullNameDeposit = $('#fullNameDeposit');
+    page.elements.emailDeposit = $('#emailDeposit');
+    page.elements.balanceDeposit = $('#balanceDeposit');
+    page.elements.transactionAmountDeposit = $('#transactionAmountDeposit');
 
     page.elements.loading = $('#loading');
 
@@ -352,10 +357,10 @@
     // ======================DEPOSIT CUSTOMER========================
 
     page.elements.btnDeposit.on('click', async () => {
-        const fullName = $('#fullNameDeposit').val();
-        const email = $('#emailDeposit').val();
-        var balance = $('#balanceDeposit').val();
-        var transactionAmount = $('#transactionAmountDeposit').val();
+        const fullName = page.elements.fullNameDeposit.val();
+        const email = page.elements.emailDeposit.val();
+        var balance = page.elements.balanceDeposit.val();
+        var transactionAmount = page.elements.transactionAmountDeposit.val();
 
         balance = parseFloat(balance);
         transactionAmount = parseFloat(transactionAmount);
@@ -368,30 +373,53 @@
             balance
         }
 
-        const response = await fetch("http://localhost:8080/api/customers/" + customerId, {
-            method: 'PATCH',
+        $.ajax({
             headers: {
                 "Content-type": "application/json; charset=UTF-8"
             },
-            body: JSON.stringify(obj)
-        });
-        const depositCustomer = await response.json();
+            type: 'PATCH',
+            url: page.url.depositCustomer + '/' + customerId,
+            data: JSON.stringify(obj)
+        })
+            .done((data) => {
+                console.log(data)
+                const updateRow = $('#tr_' + customerId)
+                const str = page.commands.renderCustomer(data)
+                updateRow.replaceWith(str)
 
-        const updateRow = $('#tr_' + customerId)
-        updateRow.replaceWith(renderCustomer(depositCustomer));
+                page.elements.modalUpdate.modal('hide');
+                page.elements.toastBody.text('Nạp tiền thành công');
+                page.elements.toastBootstrap.show();
 
-        page.elements.modalDeposit.modal('hide');
-        page.elements.toastBody.text('Nạp tiền thành công');
-        page.elements.toastBootstrap.show();
+            })
+            .fail((err) => {
+                const responseJSON = err.responseJSON
+
+                if (responseJSON) {
+                    let str = '<ul>'
+                    $.each(responseJSON, (k, v) => {
+                        if (k.includes('.')) {
+                            str += `<li><label for="${k.split('.')[1] + 'Cre'}">${v}</label></li>`
+                        } else {
+                            str += `<li><label for="${k + 'Up'}">${v}</label></li>`
+                        }
+
+                    })
+
+                    str += '</ul>'
+
+                    $('#modalUpdate .area-error').append(str).removeClass('hide').css('display', '')
+                }
+            })
+            .always(() => {
+                page.elements.btnUpdate.prop("disabled", false);
+                page.elements.loading.addClass('hide')
+            });
 
         addEventUpdate();
         addEventDelete();
         addEventDeposit()
         addEventWithdraw();
-
-        setTimeout(() => {
-            page.elements.btnCloseToast.click()
-        }, 2500);
     })
 
     // ======================WITHDRAW CUSTOMER========================
@@ -446,6 +474,20 @@
         })
     }
 
+    page.elements.modalCreate.on('hidden.bs.modal', () => {
+        $('#modalCreate .area-error').empty().addClass('hide');
+        $('#frmCreate').trigger('reset')
+        $('#frmCreate input').removeClass('error')
+        $('#frmCreate label.error').remove()
+    })
+
+    page.elements.modalUpdate.on('hidden.bs.modal', () => {
+        $('#modalUpdate .area-error').empty().addClass('hide');
+        page.elements.frmUpdate.trigger('reset')
+        $('#frmUpdate input').removeClass('error')
+        $('#frmUpdate label.error').remove()
+    })
+
 
     function addEventUpdate() {
         const btnUpdateElems = $('.edit');
@@ -461,13 +503,16 @@
                 page.elements.phoneUpdate.val(customer.phone);
                 page.elements.addressUpdate.val(customer.locationRegion.address)
 
+
+                page.commands.getAllDistricts(customer.locationRegion.provinceId, page.elements.districtUpdate)
+
+                page.elements.districtUpdate.val(customer.locationRegion.districtId);
+
+                page.commands.getAllWards(customer.locationRegion.districtId, page.elements.wardUpdate)
+
+                page.elements.wardUpdate.val(customer.locationRegion.wardId);
+
                 page.elements.provinceUpdate.val(customer.locationRegion.provinceId);
-
-                await page.commands.getAllDistricts(customer.locationRegion.provinceId, page.elements.districtUpdate);
-                await page.elements.districtUpdate.val(customer.locationRegion.districtId);
-
-                await page.commands.getAllWards(customer.locationRegion.districtId, page.elements.wardUpdate);
-                await page.elements.wardUpdate.val(customer.locationRegion.wardId);
 
                 page.elements.modalUpdate.modal('show');
             })
@@ -495,12 +540,12 @@
         $.each(btnShowDeposit, (index, item) => {
             $(item).on('click', async () => {
                 customerId = $(item).data('id');
-                const customer = await getCustomerById(customerId);
-                $('#modalDeposit').modal('show');
+                const customer = await page.loadData.getCustomerById(customerId);
+                page.elements.modalDeposit.modal('show');
 
-                $('#fullNameDeposit').val(customer.fullName);
-                $('#emailDeposit').val(customer.email);
-                $('#balanceDeposit').val(customer.balance);
+                page.elements.fullNameDeposit.val(customer.fullName);
+                page.elements.emailDeposit.val(customer.email);
+                page.elements.balanceDeposit.val(customer.balance);
             })
         })
     }

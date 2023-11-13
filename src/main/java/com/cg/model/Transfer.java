@@ -30,13 +30,13 @@ public class Transfer implements Validator {
     @ManyToOne
     @JoinColumn(name = "recipient_id", referencedColumnName = "id", nullable = false)
     private Customer recipient;
-    @Column(name = "transfer_amount", columnDefinition = "decimal(10,2)")
+    @Column(name = "transfer_amount", columnDefinition = "decimal(10,0)")
     private BigDecimal transferAmount;
     @Column(columnDefinition = "bigint default 10")
     private Long fees;
-    @Column(name = "fees_amount", columnDefinition = "decimal(10,2)")
+    @Column(name = "fees_amount", columnDefinition = "decimal(10,0)")
     private BigDecimal feesAmount;
-    @Column(name = "transaction_amount", columnDefinition = "decimal(10,2)")
+    @Column(name = "transaction_amount", columnDefinition = "decimal(10,0)")
     private BigDecimal transactionAmount;
     @Column(columnDefinition = "boolean default false")
     private Boolean deleted;
