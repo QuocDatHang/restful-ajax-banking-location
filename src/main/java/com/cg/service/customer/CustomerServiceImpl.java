@@ -5,7 +5,9 @@ import com.cg.model.*;
 import com.cg.model.dto.CustomerUpReqDTO;
 import com.cg.repository.ICustomerRepository;
 
+import com.cg.repository.IDepositRepository;
 import com.cg.repository.ILocationRegionRepository;
+import com.cg.repository.IWithdrawRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,10 @@ import java.util.stream.Collectors;
 public class CustomerServiceImpl implements ICustomerService {
     @Autowired
     private ICustomerRepository customerRepository;
+    @Autowired
+    private IDepositRepository depositRepository;
+    @Autowired
+    private IWithdrawRepository withdrawRepository;
     @Autowired
     private ILocationRegionRepository locationRegionRepository;
 
@@ -73,20 +79,16 @@ public class CustomerServiceImpl implements ICustomerService {
 
     public void deposit(Deposit deposit) {
         Customer customer = deposit.getCustomer();
-        BigDecimal currentBalance = customer.getBalance();
         BigDecimal transactionAmount = deposit.getTransactionAmount();
-        BigDecimal newBalance = currentBalance.add(transactionAmount);
-        customer.setBalance(newBalance);
-        customerRepository.save(customer);
+        customerRepository.incrementBalance(customer.getId(), transactionAmount);
+        depositRepository.save(deposit);
     }
 
     public void withdraw(Withdraw withdraw) {
         Customer customer = withdraw.getCustomer();
-        BigDecimal currentBalance = customer.getBalance();
         BigDecimal transactionAmount = withdraw.getTransactionAmount();
-        BigDecimal newBalance = currentBalance.subtract(transactionAmount);
-        customer.setBalance(newBalance);
-        customerRepository.save(customer);
+        customerRepository.decrementBalance(customer.getId(), transactionAmount);
+        withdrawRepository.save(withdraw);
     }
 
     @Override

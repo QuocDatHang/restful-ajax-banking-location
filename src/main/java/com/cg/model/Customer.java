@@ -30,7 +30,7 @@ public class Customer {
     @OneToOne
     @JoinColumn(name = "location_region_id", referencedColumnName = "id", nullable = false)
     private LocationRegion locationRegion;
-    @Column(columnDefinition = "decimal(10,0) default 0", nullable = false, updatable = false)
+    @Column(columnDefinition = "decimal(10,0)", nullable = false, updatable = false)
     private BigDecimal balance;
 
     private Boolean deleted;

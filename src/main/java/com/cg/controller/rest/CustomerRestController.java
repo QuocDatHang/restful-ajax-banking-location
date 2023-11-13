@@ -4,10 +4,7 @@ import com.cg.exception.DataInputException;
 import com.cg.model.Customer;
 import com.cg.model.Deposit;
 import com.cg.model.Withdraw;
-import com.cg.model.dto.CustomerCreReqDTO;
-import com.cg.model.dto.CustomerResDTO;
-import com.cg.model.dto.CustomerUpReqDTO;
-import com.cg.model.dto.DepositReqDTO;
+import com.cg.model.dto.*;
 import com.cg.service.customer.ICustomerService;
 import com.cg.utils.AppUtils;
 import lombok.AllArgsConstructor;
@@ -80,7 +77,31 @@ public class CustomerRestController {
         if (customer == null) {
             throw new DataInputException("Customer not found");
         }
+        if (bindingResult.hasErrors()) {
+            return appUtils.mapErrorToResponse(bindingResult);
+        }
 
+        Deposit deposit = depositReqDTO.toDeposit();
+        deposit.setCustomer(customer);
+        customerService.deposit(deposit);
+
+        customer = customerService.findById(customerId);
+        return new ResponseEntity<>(customer.toCustomerResDTO(), HttpStatus.OK);
+    }
+
+    @PostMapping("/withdraw/{customerId}")
+    public ResponseEntity<?> withdraw(@PathVariable Long customerId, @RequestBody WithdrawReqDTO withdrawReqDTO, BindingResult bindingResult) {
+            Customer customer = customerService.findById(customerId);
+        if (customer == null) {
+            throw new DataInputException("Customer not found");
+        }
+        if (bindingResult.hasErrors()) {
+            return appUtils.mapErrorToResponse(bindingResult);
+        }
+
+        Withdraw withdraw = withdrawReqDTO.toWithdraw();
+        withdraw.setCustomer(customer);
+        customerService.withdraw(withdraw);
 
         customer = customerService.findById(customerId);
         return new ResponseEntity<>(customer.toCustomerResDTO(), HttpStatus.OK);
